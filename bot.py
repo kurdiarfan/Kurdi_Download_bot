@@ -1,4 +1,6 @@
 import os
+from flask import Flask
+from threading import Thread
 import re
 import asyncio
 import tempfile
@@ -20,7 +22,17 @@ TOKEN = os.environ["BOT_TOKEN"]
 MAX_SIZE = 49 * 1024 * 1024
 LIMIT = asyncio.Semaphore(2)
 
+server = Flask(__name__)
 
+@server.route("/")
+def home():
+    return "Kurdi Download Bot is running!"
+
+def run_server():
+    server.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 10000))
+    )
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 بەخێربێیت بۆ Kurdi Download Bot\n\n"
@@ -188,4 +200,5 @@ def main():
 
 
 if __name__ == "__main__":
+    Thread(target=run_server, daemon=True).start()
     main()
